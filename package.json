@@ -1,0 +1,23 @@
+{
+  "name": "prompt-gen-app",
+  "version": "1.0.0",
+  "description": "AI视频提示词生成应用 - 支持Sora 2, Veo 3, Seedance 2.0",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["ai", "video", "prompt", "sora", "veo", "seedance", "cloudflare-workers"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^3.109.2",
+    "workers-ai-provider": "^0.2.1"
+  }
+}

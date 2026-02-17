@@ -6,20 +6,14 @@
   <title>AI视频提示词生成器 - Sora/Veo/Seedance</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .card-shadow {
-      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);
-    }
-    .prompt-box {
-      font-family: 'Monaco', 'Menlo', monospace;
-      white-space: pre-wrap;
-    }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2); }
+    .prompt-box { font-family: 'Monaco', 'Menlo', monospace; white-space: pre-wrap; }
+    .platform-icon { transition: all 0.2s; }
+    .platform-icon:hover { transform: scale(1.1); }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-  <!-- 头部 -->
   <header class="gradient-bg text-white py-6">
     <div class="container mx-auto px-4">
       <h1 class="text-3xl font-bold">AI视频提示词生成器</h1>
@@ -27,140 +21,119 @@
     </div>
   </header>
 
-  <!-- 主内容区 -->
   <main class="container mx-auto px-4 py-8">
     <!-- 模式切换 -->
     <div class="flex justify-center mb-8">
       <div class="bg-white rounded-lg p-1 shadow-md inline-flex">
-        <button id="mode-text" class="px-6 py-2 rounded-md bg-blue-500 text-white font-medium transition">
-          文本生成
-        </button>
-        <button id="mode-video" class="px-6 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">
-          视频解析
-        </button>
+        <button id="mode-text" class="px-6 py-2 rounded-md bg-blue-500 text-white font-medium transition">文本生成</button>
+        <button id="mode-link" class="px-6 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">链接解析</button>
+        <button id="mode-video" class="px-6 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">视频上传</button>
       </div>
     </div>
 
     <!-- 文本生成模式 -->
     <div id="text-mode" class="max-w-4xl mx-auto">
-      <!-- 输入区 -->
       <div class="bg-white rounded-xl card-shadow p-6 mb-6">
-        <label class="block text-gray-700 font-semibold mb-2">
-          描述你想要的视频效果
-        </label>
-        <textarea 
-          id="input-text" 
-          class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          placeholder="例如：一位女性在东京雨夜行走，霓虹灯反射在湿润的地面上，电影感画面..."
-        ></textarea>
-        
-        <!-- 快速模板 -->
+        <label class="block text-gray-700 font-semibold mb-2">描述你想要的视频效果</label>
+        <textarea id="input-text" class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none" placeholder="例如：一位女性在东京雨夜行走，霓虹灯反射在湿润的地面上..."></textarea>
         <div class="mt-4">
           <span class="text-sm text-gray-500">快速选择模板：</span>
-          <div id="template-tags" class="flex flex-wrap gap-2 mt-2">
-            <!-- 模板标签将通过JS动态加载 -->
-          </div>
+          <div id="template-tags" class="flex flex-wrap gap-2 mt-2"></div>
         </div>
-
-        <button 
-          id="btn-generate" 
-          class="mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2"
-        >
-          <span>✨</span>
-          <span>AI生成提示词</span>
-        </button>
+        <button id="btn-generate" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition">AI生成提示词</button>
       </div>
-
-      <!-- 加载状态 -->
       <div id="loading" class="hidden text-center py-8">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         <p class="mt-2 text-gray-600">AI正在分析并生成提示词...</p>
       </div>
-
-      <!-- 结果展示区 -->
       <div id="results" class="hidden">
         <h2 class="text-xl font-bold text-gray-800 mb-4">生成结果</h2>
-        
         <div class="grid md:grid-cols-3 gap-4">
-          <!-- Sora 2 -->
           <div class="bg-white rounded-xl card-shadow overflow-hidden">
-            <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-3">
-              <h3 class="font-bold">Sora 2</h3>
-              <p class="text-xs opacity-90">OpenAI 叙事驱动</p>
-            </div>
+            <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-3"><h3 class="font-bold">Sora 2</h3></div>
             <div class="p-4">
               <div id="result-sora2" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[120px]"></div>
-              <button onclick="copyToClipboard('result-sora2')" class="w-full py-2 border border-pink-500 text-pink-500 rounded-lg hover:bg-pink-50 transition text-sm font-medium">
-                📋 复制提示词
-              </button>
+              <button onclick="copyToClipboard('result-sora2')" class="w-full py-2 border border-pink-500 text-pink-500 rounded-lg hover:bg-pink-50 text-sm">复制提示词</button>
             </div>
           </div>
-
-          <!-- Veo 3 -->
           <div class="bg-white rounded-xl card-shadow overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-3">
-              <h3 class="font-bold">Veo 3</h3>
-              <p class="text-xs opacity-90">Google 技术精确</p>
-            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-3"><h3 class="font-bold">Veo 3</h3></div>
             <div class="p-4">
               <div id="result-veo3" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[120px]"></div>
-              <button onclick="copyToClipboard('result-veo3')" class="w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 transition text-sm font-medium">
-                📋 复制提示词
-              </button>
+              <button onclick="copyToClipboard('result-veo3')" class="w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 text-sm">复制提示词</button>
             </div>
           </div>
-
-          <!-- Seedance 2.0 -->
           <div class="bg-white rounded-xl card-shadow overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-3">
-              <h3 class="font-bold">Seedance 2.0</h3>
-              <p class="text-xs opacity-90">ByteDance 参考优先</p>
-            </div>
+            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-3"><h3 class="font-bold">Seedance 2.0</h3></div>
             <div class="p-4">
               <div id="result-seedance2" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[120px]"></div>
-              <button onclick="copyToClipboard('result-seedance2')" class="w-full py-2 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-50 transition text-sm font-medium">
-                📋 复制提示词
-              </button>
+              <button onclick="copyToClipboard('result-seedance2')" class="w-full py-2 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-50 text-sm">复制提示词</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 视频解析模式（简化版） -->
+    <!-- 链接解析模式 -->
+    <div id="link-mode" class="max-w-2xl mx-auto hidden">
+      <div class="bg-white rounded-xl card-shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-2">视频链接解析</h2>
+        <p class="text-gray-600 mb-4">粘贴视频分享链接，AI将分析内容并生成提示词</p>
+        <div class="mb-4">
+          <span class="text-sm text-gray-500">支持平台：</span>
+          <div class="flex flex-wrap gap-3 mt-2">
+            <span class="platform-icon px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm">抖音</span>
+            <span class="platform-icon px-3 py-1 bg-black text-white rounded-full text-sm">TikTok</span>
+            <span class="platform-icon px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-sm">B站</span>
+            <span class="platform-icon px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm">快手</span>
+            <span class="platform-icon px-3 py-1 bg-red-50 text-red-500 rounded-full text-sm">小红书</span>
+            <span class="platform-icon px-3 py-1 bg-orange-50 text-orange-500 rounded-full text-sm">微博</span>
+          </div>
+        </div>
+        <div class="relative">
+          <input type="text" id="video-url-input" placeholder="粘贴视频分享链接，如：https://v.douyin.com/xxx" class="w-full px-4 py-3 pr-24 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <button id="btn-parse-url" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 text-sm">解析</button>
+        </div>
+        <div id="parse-loading" class="hidden text-center py-4 mt-4">
+          <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <p class="mt-2 text-gray-600 text-sm">正在解析视频信息...</p>
+        </div>
+        <div id="video-info" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex gap-4">
+            <img id="video-cover" class="w-32 h-20 object-cover rounded-lg bg-gray-200" src="" alt="封面">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1"><span id="video-platform" class="px-2 py-0.5 bg-blue-100 text-blue-600 rounded text-xs"></span></div>
+              <h3 id="video-title" class="font-medium text-gray-800 line-clamp-2"></h3>
+              <p id="video-author" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+          </div>
+        </div>
+        <div id="link-results" class="hidden mt-4"></div>
+      </div>
+    </div>
+
+    <!-- 视频上传模式 -->
     <div id="video-mode" class="max-w-2xl mx-auto hidden">
       <div class="bg-white rounded-xl card-shadow p-8 text-center">
-        <div class="text-6xl mb-4">🎬</div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">视频反向解析</h2>
-        <p class="text-gray-600 mb-6">上传视频，AI将分析内容并生成提示词</p>
-        
+        <div class="text-6xl mb-4">📁</div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">视频文件上传</h2>
+        <p class="text-gray-600 mb-6">上传视频文件，AI将分析内容并生成提示词</p>
         <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition cursor-pointer" id="upload-area">
           <p class="text-gray-500">拖拽视频到这里，或点击上传</p>
           <p class="text-sm text-gray-400 mt-2">支持 MP4, MOV, WEBM (最大100MB)</p>
         </div>
-        
         <input type="file" id="video-input" accept="video/*" class="hidden">
-        
-        <div class="mt-4">
-          <p class="text-sm text-gray-500">或者粘贴YouTube链接：</p>
-          <input 
-            type="text" 
-            placeholder="https://youtube.com/watch?v=..."
-            class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-        </div>
+        <p class="text-sm text-gray-400 mt-4">提示：视频上传功能需要配置R2存储，建议使用链接解析模式</p>
       </div>
     </div>
   </main>
 
-  <!-- 页脚 -->
   <footer class="bg-gray-800 text-gray-400 py-6 mt-12">
     <div class="container mx-auto px-4 text-center">
-      <p>AI视频提示词生成器 &copy; 2026</p>
-      <p class="text-sm mt-1">支持 Sora 2 / Veo 3 / Seedance 2.0</p>
+      <p>AI视频提示词生成器 2026</p>
+      <p class="text-sm mt-1">支持 Sora 2 / Veo 3 / Seedance 2.0 | 抖音 / TikTok / B站 / 快手 / 小红书 / 微博</p>
     </div>
   </footer>
-
   <script src="/app.js"></script>
 </body>
 </html>

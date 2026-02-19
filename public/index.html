@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI视频提示词生成器 - Sora/Veo/Seedance</title>
+  <title>AI提示词生成器 - 视频/图片</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -11,42 +11,44 @@
     .prompt-box { font-family: 'Monaco', 'Menlo', monospace; white-space: pre-wrap; }
     .platform-icon { transition: all 0.2s; }
     .platform-icon:hover { transform: scale(1.1); }
+    .mode-btn.active { background-color: #3b82f6; color: white; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
   <header class="gradient-bg text-white py-6">
     <div class="container mx-auto px-4">
-      <h1 class="text-3xl font-bold">AI视频提示词生成器</h1>
-      <p class="mt-2 text-blue-100">为 Sora 2 / Veo 3 / Seedance 2.0 生成专业提示词</p>
+      <h1 class="text-3xl font-bold">AI提示词生成器</h1>
+      <p class="mt-2 text-blue-100">视频提示词 + 图片提示词，一站式生成</p>
     </div>
   </header>
 
   <main class="container mx-auto px-4 py-8">
     <!-- 模式切换 -->
     <div class="flex justify-center mb-8">
-      <div class="bg-white rounded-lg p-1 shadow-md inline-flex">
-        <button id="mode-text" class="px-6 py-2 rounded-md bg-blue-500 text-white font-medium transition">文本生成</button>
-        <button id="mode-link" class="px-6 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">链接解析</button>
-        <button id="mode-video" class="px-6 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">视频上传</button>
+      <div class="bg-white rounded-lg p-1 shadow-md inline-flex flex-wrap justify-center gap-1">
+        <button id="mode-video-text" class="mode-btn px-5 py-2 rounded-md font-medium transition">🎬 视频文字</button>
+        <button id="mode-video-link" class="mode-btn px-5 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">🔗 视频链接</button>
+        <button id="mode-image-gen" class="mode-btn px-5 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">🖼️ 图片生成</button>
+        <button id="mode-image-parse" class="mode-btn px-5 py-2 rounded-md text-gray-600 font-medium transition hover:bg-gray-100">📷 图片解析</button>
       </div>
     </div>
 
-    <!-- 文本生成模式 -->
-    <div id="text-mode" class="max-w-4xl mx-auto">
+    <!-- 视频文字生成模式 -->
+    <div id="video-text-mode" class="max-w-4xl mx-auto">
       <div class="bg-white rounded-xl card-shadow p-6 mb-6">
         <label class="block text-gray-700 font-semibold mb-2">描述你想要的视频效果</label>
-        <textarea id="input-text" class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none" placeholder="例如：一位女性在东京雨夜行走，霓虹灯反射在湿润的地面上..."></textarea>
+        <textarea id="input-video-text" class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none" placeholder="例如：一位女性在东京雨夜行走，霓虹灯反射在湿润的地面上..."></textarea>
         <div class="mt-4">
           <span class="text-sm text-gray-500">快速选择模板：</span>
           <div id="template-tags" class="flex flex-wrap gap-2 mt-2"></div>
         </div>
-        <button id="btn-generate" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition">AI生成提示词</button>
+        <button id="btn-generate-video" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition">AI生成视频提示词</button>
       </div>
-      <div id="loading" class="hidden text-center py-8">
+      <div id="video-loading" class="hidden text-center py-8">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         <p class="mt-2 text-gray-600">AI正在分析并生成提示词...</p>
       </div>
-      <div id="results" class="hidden">
+      <div id="video-results" class="hidden">
         <h2 class="text-xl font-bold text-gray-800 mb-4">生成结果</h2>
         <div class="grid md:grid-cols-3 gap-4">
           <div class="bg-white rounded-xl card-shadow overflow-hidden">
@@ -74,8 +76,8 @@
       </div>
     </div>
 
-    <!-- 链接解析模式 -->
-    <div id="link-mode" class="max-w-2xl mx-auto hidden">
+    <!-- 视频链接解析模式 -->
+    <div id="video-link-mode" class="max-w-2xl mx-auto hidden">
       <div class="bg-white rounded-xl card-shadow p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-2">视频链接解析</h2>
         <p class="text-gray-600 mb-4">粘贴视频分享链接，AI将分析内容并生成提示词</p>
@@ -112,26 +114,144 @@
       </div>
     </div>
 
-    <!-- 视频上传模式 -->
-    <div id="video-mode" class="max-w-2xl mx-auto hidden">
-      <div class="bg-white rounded-xl card-shadow p-8 text-center">
-        <div class="text-6xl mb-4">📁</div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">视频文件上传</h2>
-        <p class="text-gray-600 mb-6">上传视频文件，AI将分析内容并生成提示词</p>
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition cursor-pointer" id="upload-area">
-          <p class="text-gray-500">拖拽视频到这里，或点击上传</p>
-          <p class="text-sm text-gray-400 mt-2">支持 MP4, MOV, WEBM (最大100MB)</p>
+    <!-- 图片生成模式 -->
+    <div id="image-gen-mode" class="max-w-4xl mx-auto hidden">
+      <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+        <label class="block text-gray-700 font-semibold mb-2">描述你想要的图片</label>
+        <textarea id="input-image-text" class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none" placeholder="例如：一只可爱的橘猫坐在窗台上，阳光透过窗帘洒在它身上..."></textarea>
+        
+        <div class="mt-4">
+          <span class="text-sm text-gray-500 mb-2 block">选择图片模型：</span>
+          <div id="image-model-tags" class="flex flex-wrap gap-2">
+            <button class="model-btn px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-medium" data-model="midjourney">🎨 Midjourney</button>
+            <button class="model-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700" data-model="stable-diffusion">🖌️ Stable Diffusion</button>
+            <button class="model-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700" data-model="dalle3">🎭 DALL-E 3</button>
+            <button class="model-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700" data-model="ideogram">✍️ Ideogram</button>
+            <button class="model-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700" data-model="nano-banana">🍌 Nano Banana</button>
+          </div>
         </div>
-        <input type="file" id="video-input" accept="video/*" class="hidden">
-        <p class="text-sm text-gray-400 mt-4">提示：视频上传功能需要配置R2存储，建议使用链接解析模式</p>
+
+        <button id="btn-generate-image" class="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition">AI生成图片提示词</button>
+      </div>
+      
+      <div id="image-loading" class="hidden text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        <p class="mt-2 text-gray-600">AI正在生成优化提示词...</p>
+      </div>
+      
+      <div id="image-results" class="hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">生成结果</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3"><h3 class="font-bold">🎨 Midjourney</h3></div>
+            <div class="p-4">
+              <div id="result-midjourney" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[100px]"></div>
+              <button onclick="copyToClipboard('result-midjourney')" class="w-full py-2 border border-purple-500 text-purple-500 rounded-lg hover:bg-purple-50 text-sm">复制</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-3"><h3 class="font-bold">🖌️ Stable Diffusion</h3></div>
+            <div class="p-4">
+              <div id="result-sd" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[100px]"></div>
+              <button onclick="copyToClipboard('result-sd')" class="w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 text-sm">复制</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-3"><h3 class="font-bold">🎭 DALL-E 3</h3></div>
+            <div class="p-4">
+              <div id="result-dalle3" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[100px]"></div>
+              <button onclick="copyToClipboard('result-dalle3')" class="w-full py-2 border border-green-500 text-green-500 rounded-lg hover:bg-green-50 text-sm">复制</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-3"><h3 class="font-bold">✍️ Ideogram</h3></div>
+            <div class="p-4">
+              <div id="result-ideogram" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[100px]"></div>
+              <button onclick="copyToClipboard('result-ideogram')" class="w-full py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 text-sm">复制</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-4 py-3"><h3 class="font-bold">🍌 Nano Banana</h3></div>
+            <div class="p-4">
+              <div id="result-nano" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg mb-3 min-h-[100px]"></div>
+              <button onclick="copyToClipboard('result-nano')" class="w-full py-2 border border-yellow-500 text-yellow-500 rounded-lg hover:bg-yellow-50 text-sm">复制</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片解析模式 -->
+    <div id="image-parse-mode" class="max-w-2xl mx-auto hidden">
+      <div class="bg-white rounded-xl card-shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-2">图片反向解析</h2>
+        <p class="text-gray-600 mb-4">上传图片，AI将分析内容并生成各模型提示词</p>
+        
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-purple-500 transition cursor-pointer text-center" id="image-upload-area">
+          <div class="text-5xl mb-3">🖼️</div>
+          <p class="text-gray-500">点击或拖拽图片到这里</p>
+          <p class="text-sm text-gray-400 mt-2">支持 JPG, PNG, WebP, GIF (最大10MB)</p>
+        </div>
+        <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden">
+        
+        <div id="image-preview" class="hidden mt-4">
+          <img id="preview-img" class="max-w-full max-h-64 mx-auto rounded-lg shadow" src="" alt="预览">
+          <p id="image-name" class="text-center text-sm text-gray-500 mt-2"></p>
+        </div>
+        
+        <button id="btn-analyze-image" class="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition disabled:opacity-50" disabled>AI分析图片</button>
+      </div>
+      
+      <div id="analyze-loading" class="hidden text-center py-8 mt-6">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        <p class="mt-2 text-gray-600">AI正在分析图片...</p>
+      </div>
+      
+      <div id="analysis-results" class="hidden mt-6">
+        <div class="bg-white rounded-xl card-shadow p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📊 图片分析结果</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">描述：</span><span id="analysis-caption" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">主体：</span><span id="analysis-subjects" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">风格：</span><span id="analysis-style" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">光照：</span><span id="analysis-lighting" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">构图：</span><span id="analysis-composition" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg"><span class="font-medium text-gray-600">色彩：</span><span id="analysis-colors" class="text-gray-800"></span></div>
+            <div class="p-3 bg-gray-50 rounded-lg col-span-2"><span class="font-medium text-gray-600">氛围：</span><span id="analysis-mood" class="text-gray-800"></span></div>
+          </div>
+        </div>
+        
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-4">💡 各模型提示词</h3>
+        <div class="grid gap-4">
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2"><h4 class="font-bold">🎨 Midjourney</h4></div>
+            <div class="p-4"><div id="parse-midjourney" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg"></div></div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2"><h4 class="font-bold">🖌️ Stable Diffusion</h4></div>
+            <div class="p-4"><div id="parse-sd" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg"></div></div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-2"><h4 class="font-bold">🎭 DALL-E 3</h4></div>
+            <div class="p-4"><div id="parse-dalle3" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg"></div></div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2"><h4 class="font-bold">✍️ Ideogram</h4></div>
+            <div class="p-4"><div id="parse-ideogram" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg"></div></div>
+          </div>
+          <div class="bg-white rounded-xl card-shadow overflow-hidden">
+            <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-4 py-2"><h4 class="font-bold">🍌 Nano Banana</h4></div>
+            <div class="p-4"><div id="parse-nano" class="prompt-box text-sm text-gray-700 bg-gray-50 p-3 rounded-lg"></div></div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
   <footer class="bg-gray-800 text-gray-400 py-6 mt-12">
     <div class="container mx-auto px-4 text-center">
-      <p>AI视频提示词生成器 2026</p>
-      <p class="text-sm mt-1">支持 Sora 2 / Veo 3 / Seedance 2.0 | 抖音 / TikTok / B站 / 快手 / 小红书 / 微博</p>
+      <p>AI提示词生成器 2026</p>
+      <p class="text-sm mt-1">支持 Sora 2 / Veo 3 / Seedance 2.0 | Midjourney / SD / DALL-E 3 / Ideogram / Nano Banana</p>
     </div>
   </footer>
   <script src="/app.js"></script>
